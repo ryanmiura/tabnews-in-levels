@@ -9,7 +9,7 @@ const initialState = {
   // Filtros de busca
   page: 1,
   per_page: 10,
-  strategy: 'new',
+  strategy: 'relevant',
   // Estados de loading
   loading: false,
   listLoading: false,
