@@ -4,20 +4,23 @@ import Header from './components/ui/Header.jsx'
 import Home from './components/pages/Home.jsx'
 import Article from './components/pages/Article.jsx'
 import { NewsProvider } from './contexts/NewsContext.jsx'
+import { MockProvider } from './contexts/MockContext.jsx'
 
 function App() {
   return (
-    <NewsProvider>
-      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-        <Header />
-        <Box component="main" sx={{ flexGrow: 1 }}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/contents/:user/:slug" element={<Article />} />
-          </Routes>
+    <MockProvider>
+      <NewsProvider>
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+          <Header />
+          <Box component="main" sx={{ flexGrow: 1 }}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/contents/:user/:slug" element={<Article />} />
+            </Routes>
+          </Box>
         </Box>
-      </Box>
-    </NewsProvider>
+      </NewsProvider>
+    </MockProvider>
   )
 }
 

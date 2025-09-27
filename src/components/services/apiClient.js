@@ -1,4 +1,14 @@
 import axios from 'axios';
+import { getContentsMock, getContentMock } from './mockService.js';
+
+// Função para verificar se deve usar mocks
+// Esta função será definida dinamicamente pelo contexto
+let shouldUseMocks = () => false; // Por padrão usar API real
+
+// Função para configurar o estado dos mocks
+export const configureMocks = (useMocksFunction) => {
+  shouldUseMocks = useMocksFunction;
+};
 
 // Configuração base da API
 const BASE_URL = 'https://www.tabnews.com.br/api/v1';
@@ -46,6 +56,12 @@ apiClient.interceptors.response.use(
  */
 export const getContents = async ({ page = 1, per_page = 10, strategy = 'new' } = {}) => {
   try {
+    // Verifica se deve usar mocks
+    if (shouldUseMocks()) {
+      return await getContentsMock({ page, per_page, strategy });
+    }
+
+    // Usar API real
     const params = {
       page,
       per_page,
@@ -56,6 +72,17 @@ export const getContents = async ({ page = 1, per_page = 10, strategy = 'new' } 
     return data;
   } catch (error) {
     console.error('Erro ao buscar conteúdos:', error);
+    
+    // Se falhar com API real, tenta usar mock como fallback
+    if (!shouldUseMocks()) {
+      console.warn('🎭 API real falhou, usando mock como fallback');
+      try {
+        return await getContentsMock({ page, per_page, strategy });
+      } catch (mockError) {
+        console.error('Erro também no mock:', mockError);
+      }
+    }
+    
     throw error;
   }
 };
@@ -72,10 +99,27 @@ export const getContent = async (user, slug) => {
       throw new Error('Usuário e slug são obrigatórios');
     }
 
+    // Verifica se deve usar mocks
+    if (shouldUseMocks()) {
+      return await getContentMock(user, slug);
+    }
+
+    // Usar API real
     const data = await apiClient.get(`/contents/${user}/${slug}`);
     return data;
   } catch (error) {
     console.error(`Erro ao buscar conteúdo ${user}/${slug}:`, error);
+    
+    // Se falhar com API real, tenta usar mock como fallback
+    if (!shouldUseMocks()) {
+      console.warn('🎭 API real falhou, usando mock como fallback');
+      try {
+        return await getContentMock(user, slug);
+      } catch (mockError) {
+        console.error('Erro também no mock:', mockError);
+      }
+    }
+    
     throw error;
   }
 };

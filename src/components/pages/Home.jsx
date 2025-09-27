@@ -3,8 +3,12 @@ import {
   Typography, 
   Box, 
   Grid,
+  Switch,
+  FormControlLabel,
+  Chip,
 } from '@mui/material';
 import { useNews } from '../../contexts/NewsContext.jsx';
+import { useMockContext } from '../../contexts/MockContext.jsx';
 import NewsCard from '../ui/NewsCard.jsx';
 import FiltersBar from '../ui/FiltersBar.jsx';
 import PaginationMui from '../ui/PaginationMui.jsx';
@@ -21,9 +25,15 @@ const Home = () => {
     currentFilters,
     state 
   } = useNews();
+  
+  const { useMocks, toggleMocks } = useMockContext();
 
   const handleFiltersChange = (newFilters) => {
     actions.setFilters(newFilters);
+    // Chamar fetch após definir filtros
+    setTimeout(() => {
+      actions.fetchList();
+    }, 0);
   };
 
   const handleRefresh = () => {
@@ -33,6 +43,10 @@ const Home = () => {
 
   const handlePageChange = (newPage) => {
     actions.setPage(newPage);
+    // Chamar fetch após mudar página
+    setTimeout(() => {
+      actions.fetchList();
+    }, 0);
   };
 
   const handleRetry = () => {
@@ -42,6 +56,49 @@ const Home = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
+      {/* Debug info (remover em produção) */}
+      {process.env.NODE_ENV === 'development' && (
+        <Box sx={{ 
+          mb: 2, 
+          p: 2, 
+          bgcolor: useMocks ? 'warning.light' : 'info.light', 
+          borderRadius: 1,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 2
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+            <Chip 
+              icon={<span>{useMocks ? '🎭' : '🌐'}</span>}
+              label={useMocks ? 'MOCK MODE' : 'API REAL'} 
+              color={useMocks ? 'warning' : 'primary'}
+              size="small"
+            />
+            <Typography variant="caption">
+              {list.length} itens • Página {currentFilters.page} • {currentFilters.strategy} • Loading: {loading ? 'Sim' : 'Não'}
+            </Typography>
+          </Box>
+          
+          <FormControlLabel
+            control={
+              <Switch
+                checked={useMocks}
+                onChange={toggleMocks}
+                size="small"
+                color="warning"
+              />
+            }
+            label={
+              <Typography variant="caption">
+                Mocks {useMocks ? 'ON' : 'OFF'}
+              </Typography>
+            }
+          />
+        </Box>
+      )}
+
       {/* Cabeçalho */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" component="h1" gutterBottom>

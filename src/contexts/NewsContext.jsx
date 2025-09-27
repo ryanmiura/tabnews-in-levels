@@ -1,5 +1,6 @@
-import { createContext, useContext, useReducer, useEffect } from 'react';
-import { getContents, getContent } from '../components/services/apiClient.js';
+import { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
+import { getContents, getContent, configureMocks } from '../components/services/apiClient.js';
+import { useMockContext } from './MockContext.jsx';
 
 // Estado inicial
 const initialState = {
@@ -158,92 +159,100 @@ const NewsContext = createContext();
 // Provider
 export const NewsProvider = ({ children }) => {
   const [state, dispatch] = useReducer(newsReducer, initialState);
+  const mockContext = useMockContext();
 
-  // Action creators
+  // Configura o apiClient para usar o estado dos mocks
+  useEffect(() => {
+    configureMocks(() => mockContext.useMocks);
+  }, [mockContext.useMocks]);
+
+  // Action creators com useCallback para evitar recriações
+  const setFilters = useCallback((filters) => {
+    dispatch({ type: NEWS_ACTIONS.SET_FILTERS, payload: filters });
+  }, []);
+  
+  const setPage = useCallback((page) => {
+    dispatch({ type: NEWS_ACTIONS.SET_PAGE, payload: page });
+  }, []);
+  
+  const setPerPage = useCallback((perPage) => {
+    dispatch({ type: NEWS_ACTIONS.SET_PER_PAGE, payload: perPage });
+  }, []);
+  
+  const setStrategy = useCallback((strategy) => {
+    dispatch({ type: NEWS_ACTIONS.SET_STRATEGY, payload: strategy });
+  }, []);
+
+  const fetchList = useCallback(async (customFilters = {}) => {
+    dispatch({ type: NEWS_ACTIONS.FETCH_LIST_START });
+    
+    try {
+      const filters = {
+        page: state.page,
+        per_page: state.per_page,
+        strategy: state.strategy,
+        ...customFilters,
+      };
+      
+      console.log('Buscando lista com filtros:', filters);
+      const data = await getContents(filters);
+      console.log('Lista carregada:', data.length, 'itens');
+      
+      dispatch({ type: NEWS_ACTIONS.FETCH_LIST_SUCCESS, payload: data });
+      return data;
+    } catch (error) {
+      console.error('Erro ao buscar lista:', error);
+      dispatch({ type: NEWS_ACTIONS.FETCH_LIST_FAIL, payload: error.message });
+      throw error;
+    }
+  }, [state.page, state.per_page, state.strategy]);
+
+  const fetchArticle = useCallback(async (user, slug) => {
+    dispatch({ type: NEWS_ACTIONS.FETCH_ARTICLE_START });
+    
+    try {
+      console.log(`Buscando artigo: ${user}/${slug}`);
+      const data = await getContent(user, slug);
+      console.log('Artigo carregado:', data.title);
+      
+      dispatch({ type: NEWS_ACTIONS.FETCH_ARTICLE_SUCCESS, payload: data });
+      return data;
+    } catch (error) {
+      console.error('Erro ao buscar artigo:', error);
+      dispatch({ type: NEWS_ACTIONS.FETCH_ARTICLE_FAIL, payload: error.message });
+      throw error;
+    }
+  }, []);
+
+  const clearArticle = useCallback(() => {
+    dispatch({ type: NEWS_ACTIONS.CLEAR_ARTICLE });
+  }, []);
+  
+  const clearErrors = useCallback(() => {
+    dispatch({ type: NEWS_ACTIONS.CLEAR_ERRORS });
+  }, []);
+
   const actions = {
-    // Filtros
-    setFilters: (filters) => {
-      dispatch({ type: NEWS_ACTIONS.SET_FILTERS, payload: filters });
-    },
-    
-    setPage: (page) => {
-      dispatch({ type: NEWS_ACTIONS.SET_PAGE, payload: page });
-    },
-    
-    setPerPage: (perPage) => {
-      dispatch({ type: NEWS_ACTIONS.SET_PER_PAGE, payload: perPage });
-    },
-    
-    setStrategy: (strategy) => {
-      dispatch({ type: NEWS_ACTIONS.SET_STRATEGY, payload: strategy });
-    },
-
-    // Buscar lista de notícias
-    fetchList: async (customFilters = {}) => {
-      dispatch({ type: NEWS_ACTIONS.FETCH_LIST_START });
-      
-      try {
-        const filters = {
-          page: state.page,
-          per_page: state.per_page,
-          strategy: state.strategy,
-          ...customFilters,
-        };
-        
-        console.log('Buscando lista com filtros:', filters);
-        const data = await getContents(filters);
-        console.log('Lista carregada:', data.length, 'itens');
-        
-        dispatch({ type: NEWS_ACTIONS.FETCH_LIST_SUCCESS, payload: data });
-        return data;
-      } catch (error) {
-        console.error('Erro ao buscar lista:', error);
-        dispatch({ type: NEWS_ACTIONS.FETCH_LIST_FAIL, payload: error.message });
-        throw error;
-      }
-    },
-
-    // Buscar artigo individual
-    fetchArticle: async (user, slug) => {
-      dispatch({ type: NEWS_ACTIONS.FETCH_ARTICLE_START });
-      
-      try {
-        console.log(`Buscando artigo: ${user}/${slug}`);
-        const data = await getContent(user, slug);
-        console.log('Artigo carregado:', data.title);
-        
-        dispatch({ type: NEWS_ACTIONS.FETCH_ARTICLE_SUCCESS, payload: data });
-        return data;
-      } catch (error) {
-        console.error('Erro ao buscar artigo:', error);
-        dispatch({ type: NEWS_ACTIONS.FETCH_ARTICLE_FAIL, payload: error.message });
-        throw error;
-      }
-    },
-
-    // Limpeza
-    clearArticle: () => {
-      dispatch({ type: NEWS_ACTIONS.CLEAR_ARTICLE });
-    },
-    
-    clearErrors: () => {
-      dispatch({ type: NEWS_ACTIONS.CLEAR_ERRORS });
-    },
+    setFilters,
+    setPage,
+    setPerPage,
+    setStrategy,
+    fetchList,
+    fetchArticle,
+    clearArticle,
+    clearErrors,
   };
 
-  // Fetch inicial quando o provider for montado
+  // Fetch inicial apenas quando o provider for montado
   useEffect(() => {
-    console.log('🚀 NewsProvider montado - iniciando fetch inicial');
-    actions.fetchList().catch(console.error);
+    console.log('NewsProvider montado - iniciando fetch inicial');
+    // Usar timeout para evitar problemas de inicialização
+    const timer = setTimeout(() => {
+      fetchList().catch(console.error);
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Refetch quando filtros mudarem
-  useEffect(() => {
-    if (state.page > 1 || state.per_page !== 10 || state.strategy !== 'new') {
-      console.log('🔄 Filtros alterados - refetchando lista');
-      actions.fetchList().catch(console.error);
-    }
-  }, [state.page, state.per_page, state.strategy]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const value = {
     state,

@@ -12,7 +12,7 @@ import {
   FilterList as FilterIcon,
   Refresh as RefreshIcon,
 } from '@mui/icons-material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const FiltersBar = ({ 
   currentFilters = {},
@@ -26,6 +26,14 @@ const FiltersBar = ({
   });
   
   const [error, setError] = useState('');
+
+  // Sincronizar com os filtros do context quando mudarem
+  useEffect(() => {
+    setLocalFilters({
+      per_page: currentFilters.per_page || 10,
+      strategy: currentFilters.strategy || 'new',
+    });
+  }, [currentFilters]);
 
   const strategies = [
     { value: 'new', label: 'Mais Recentes' },
