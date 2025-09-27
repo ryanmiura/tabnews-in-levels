@@ -57,7 +57,7 @@ const Home = () => {
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       {/* Debug info (remover em produção) */}
-      {process.env.NODE_ENV === 'development' && (
+      {import.meta.env.DEV && (
         <Box sx={{ 
           mb: 2, 
           p: 2, 

@@ -15,7 +15,7 @@ const Article = () => {
       actions.clearArticle();
       actions.fetchArticle(user, slug);
     }
-  }, [user, slug]); // Removido actions da dependência
+  }, [user, slug, actions]); // Adicionado actions na dependência
 
   const handleGoBack = () => {
     navigate('/');

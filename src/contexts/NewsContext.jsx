@@ -3,7 +3,8 @@ import { getContents, getContent, configureMocks } from '../components/services/
 import { useMockContext } from './MockContext.jsx';
 
 // Estado inicial
-const initialState = {
+// eslint-disable-next-line react-refresh/only-export-components
+export const initialState = {
   // Lista de notícias
   list: [],
   // Filtros de busca
@@ -26,6 +27,7 @@ const initialState = {
 };
 
 // Tipos de ações
+// eslint-disable-next-line react-refresh/only-export-components
 export const NEWS_ACTIONS = {
   // Filtros
   SET_FILTERS: 'SET_FILTERS',
@@ -280,6 +282,7 @@ export const NewsProvider = ({ children }) => {
 };
 
 // Hook personalizado
+// eslint-disable-next-line react-refresh/only-export-components
 export const useNews = () => {
   const context = useContext(NewsContext);
   
