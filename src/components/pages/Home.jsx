@@ -1,100 +1,118 @@
-import { Container, Typography, Box, Button, Alert, CircularProgress } from '@mui/material';
+import { 
+  Container, 
+  Typography, 
+  Box, 
+  Grid,
+} from '@mui/material';
 import { useNews } from '../../contexts/NewsContext.jsx';
+import NewsCard from '../ui/NewsCard.jsx';
+import FiltersBar from '../ui/FiltersBar.jsx';
+import PaginationMui from '../ui/PaginationMui.jsx';
+import Loading from '../ui/Loading.jsx';
+import ErrorAlert from '../ui/ErrorAlert.jsx';
 
 const Home = () => {
-  const { list, loading, error, actions, currentFilters } = useNews();
+  const { 
+    list, 
+    loading, 
+    listLoading,
+    error, 
+    actions, 
+    currentFilters,
+    state 
+  } = useNews();
+
+  const handleFiltersChange = (newFilters) => {
+    actions.setFilters(newFilters);
+  };
 
   const handleRefresh = () => {
     actions.clearErrors();
     actions.fetchList();
   };
 
+  const handlePageChange = (newPage) => {
+    actions.setPage(newPage);
+  };
+
+  const handleRetry = () => {
+    actions.clearErrors();
+    actions.fetchList();
+  };
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box>
+      {/* Cabeçalho */}
+      <Box sx={{ mb: 4 }}>
         <Typography variant="h4" component="h1" gutterBottom>
           Notícias do TabNews
         </Typography>
-        <Typography variant="body1" color="text.secondary" gutterBottom>
-          Conectado ao NewsContext com useReducer
+        <Typography variant="body1" color="text.secondary">
+          Descubra as últimas discussões e artigos da comunidade de tecnologia.
         </Typography>
-        
-        {/* Informações do estado atual */}
-        <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
-          <Typography variant="subtitle2" gutterBottom>
-            Estado atual:
-          </Typography>
-          <Typography variant="body2">
-            • Página: {currentFilters.page} | Por página: {currentFilters.per_page} | Estratégia: {currentFilters.strategy}
-          </Typography>
-          <Typography variant="body2">
-            • Total de itens carregados: {list.length}
-          </Typography>
-          <Typography variant="body2">
-            • Loading: {loading ? 'Sim' : 'Não'}
-          </Typography>
-        </Box>
-        
-        {/* Controles */}
-        <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
-          <Button 
-            variant="contained" 
-            onClick={handleRefresh}
-            disabled={loading}
-            startIcon={loading ? <CircularProgress size={16} /> : null}
-          >
-            {loading ? 'Carregando...' : 'Atualizar Lista'}
-          </Button>
-          
-          <Button 
-            variant="outlined" 
-            onClick={() => actions.setStrategy('relevant')}
-            disabled={loading}
-          >
-            Relevantes
-          </Button>
-          
-          <Button 
-            variant="outlined" 
-            onClick={() => actions.setStrategy('new')}
-            disabled={loading}
-          >
-            Mais Recentes
-          </Button>
-        </Box>
-        
-        {/* Erro */}
-        {error && (
-          <Alert severity="error" sx={{ mt: 2 }} onClose={() => actions.clearErrors()}>
-            {error}
-          </Alert>
-        )}
-        
-        {/* Lista de notícias (preview simples) */}
-        {list.length > 0 && (
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Últimas {list.length} notícias:
-            </Typography>
-            {list.slice(0, 5).map((item, index) => (
-              <Box key={item.id || index} sx={{ p: 2, mb: 1, bgcolor: 'background.paper', borderRadius: 1 }}>
-                <Typography variant="subtitle1" gutterBottom>
-                  {item.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Por: {item.owner_username} • {item.tabcoins} tabcoins • {new Date(item.published_at).toLocaleDateString()}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-        )}
-        
-        {!loading && list.length === 0 && !error && (
-          <Alert severity="info" sx={{ mt: 2 }}>
-            Nenhuma notícia encontrada.
-          </Alert>
-        )}
       </Box>
+
+      {/* Filtros */}
+      <FiltersBar
+        currentFilters={currentFilters}
+        onFiltersChange={handleFiltersChange}
+        onRefresh={handleRefresh}
+        loading={loading}
+      />
+
+      {/* Erro */}
+      {error && (
+        <ErrorAlert
+          error={error}
+          title="Erro ao carregar notícias"
+          onRetry={handleRetry}
+          onClose={actions.clearErrors}
+          showDetails={true}
+        />
+      )}
+
+      {/* Loading */}
+      {listLoading && (
+        <Loading 
+          type="news-list" 
+          count={currentFilters.per_page} 
+        />
+      )}
+
+      {/* Lista de notícias */}
+      {!listLoading && list.length > 0 && (
+        <Box>
+          <Grid container spacing={3}>
+            {list.map((article) => (
+              <Grid item xs={12} sm={6} md={4} key={article.id || `${article.owner_username}-${article.slug}`}>
+                <NewsCard article={article} />
+              </Grid>
+            ))}
+          </Grid>
+
+          {/* Paginação */}
+          <PaginationMui
+            currentPage={currentFilters.page}
+            totalItems={list.length}
+            itemsPerPage={currentFilters.per_page}
+            onPageChange={handlePageChange}
+            loading={loading}
+            hasMore={state.hasMore}
+          />
+        </Box>
+      )}
+
+      {/* Estado vazio */}
+      {!listLoading && list.length === 0 && !error && (
+        <Box sx={{ textAlign: 'center', py: 8 }}>
+          <Typography variant="h6" gutterBottom color="text.secondary">
+            Nenhuma notícia encontrada
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Tente ajustar os filtros ou atualize a página.
+          </Typography>
+        </Box>
+      )}
     </Container>
   );
 };
