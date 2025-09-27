@@ -35,6 +35,16 @@ const theme = createTheme({
     borderRadius: 8,
   },
   spacing: 8,
+  components: {
+    // Customização do Container para melhor uso do espaço
+    MuiContainer: {
+      styleOverrides: {
+        maxWidthXl: {
+          maxWidth: '1400px !important', // Aumenta limite do xl
+        },
+      },
+    },
+  },
 });
 
 export default theme;

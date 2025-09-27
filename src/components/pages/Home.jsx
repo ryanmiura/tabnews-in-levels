@@ -55,7 +55,7 @@ const Home = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="xl" sx={{ py: 4 }}>
       {/* Debug info (remover em produção) */}
       {process.env.NODE_ENV === 'development' && (
         <Box sx={{ 
@@ -141,7 +141,7 @@ const Home = () => {
         <Box>
           <Grid container spacing={3}>
             {list.map((article) => (
-              <Grid item xs={12} sm={6} md={4} key={article.id || `${article.owner_username}-${article.slug}`}>
+              <Grid item xs={12} sm={6} md={4} lg={3} key={article.id || `${article.owner_username}-${article.slug}`}>
                 <NewsCard article={article} />
               </Grid>
             ))}

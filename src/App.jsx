@@ -10,7 +10,7 @@ function App() {
   return (
     <MockProvider>
       <NewsProvider>
-        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', width: '100%' }}>
           <Header />
           <Box component="main" sx={{ flexGrow: 1 }}>
             <Routes>
