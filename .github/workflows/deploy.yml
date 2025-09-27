@@ -1,0 +1,65 @@
+# Workflow para deploy no GitHub Pages
+name: Deploy to GitHub Pages
+
+# Triggers do workflow
+on:
+  # Executa no push para main
+  push:
+    branches: [ main ]
+  
+  # Permite execução manual
+  workflow_dispatch:
+
+# Define permissões para o GITHUB_TOKEN
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Permite apenas um deploy por vez, cancela execuções em andamento
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  # Job de build
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Instalar dependências
+        run: npm ci
+        
+      - name: Executar linting
+        run: npm run lint
+        
+      - name: Build do projeto
+        run: npm run build
+        
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+        
+      - name: Upload artefatos
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+  # Job de deploy
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy para GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -126,7 +126,72 @@ Em caso de problemas com a API (CORS, rate limiting), o sistema automaticamente:
 2. Em falha, utiliza dados mock baseados em dados reais
 3. Exibe banner informativo sobre o modo ativo
 
-## 👨‍💻 Autor
+## � Deploy e Produção
+
+### GitHub Pages (Configurado e Recomendado)
+
+Este projeto está **totalmente configurado** para deploy automatizado no GitHub Pages:
+
+#### **🔧 Configurações implementadas:**
+- ✅ **HashRouter**: Compatibilidade total com GitHub Pages
+- ✅ **Base path**: Configurado para `/tabnews-in-levels/`
+- ✅ **GitHub Actions**: Workflow automatizado de CI/CD
+- ✅ **Build otimizado**: Vite com assets organizados
+
+#### **📋 Passos para ativar o deploy:**
+
+1. **Ativar GitHub Pages no repositório:**
+   ```
+   GitHub → Settings → Pages → Source: "GitHub Actions"
+   ```
+
+2. **Push para main (deploy automático):**
+   ```bash
+   git add .
+   git commit -m "feat: configure GitHub Pages deployment"
+   git push origin main
+   ```
+
+3. **Acompanhar o deploy:**
+   - Acesse a aba "Actions" no GitHub
+   - O deploy será executado automaticamente
+   - URL final: `https://ryanmiura.github.io/tabnews-in-levels/`
+
+#### **🚀 Deploy manual (opcional):**
+```bash
+npm run deploy  # Usa gh-pages diretamente
+```
+
+#### **� Testar build local:**
+```bash
+npm run build    # Gera build de produção
+npm run preview  # Testa build local em http://localhost:4173/tabnews-in-levels/
+```
+
+### **⚠️ Observações importantes:**
+- **URLs com hash**: GitHub Pages usa HashRouter, então URLs ficam `#/` 
+- **CORS**: API TabNews pode ter limitações, fallback automático para mocks
+- **Performance**: Bundle grande (~654KB), otimização futura com code-splitting
+- **Cache**: GitHub Pages tem cache agressivo, pode demorar alguns minutos para atualizações
+
+### Outras Plataformas
+
+#### Vercel (Alternativa)
+Para usar Vercel, seria necessário voltar ao `BrowserRouter`:
+```bash
+# Instalar Vercel CLI (restaurar BrowserRouter antes)
+npm i -g vercel
+vercel
+```
+
+#### Netlify (Alternativa)
+```bash
+# Build + upload manual
+npm run build
+# Upload da pasta dist/ + configurar redirects
+```
+
+## 🎯 Decisões Arquiteturais
 
 **Ryan Miura**
 - GitHub: [@ryanmiura](https://github.com/ryanmiura)
