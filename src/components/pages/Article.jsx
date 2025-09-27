@@ -1,6 +1,7 @@
 import { Container, Typography, Box, Alert, CircularProgress, Button } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { useNews } from '../../contexts/NewsContext.jsx';
 
 const Article = () => {
@@ -71,21 +72,62 @@ const Article = () => {
               borderRadius: 1, 
               border: '1px solid', 
               borderColor: 'divider',
-              minHeight: 200 
+              minHeight: 200,
+              '& h1': { fontSize: '2rem', fontWeight: 600, mb: 2, mt: 3 },
+              '& h2': { fontSize: '1.5rem', fontWeight: 600, mb: 1.5, mt: 2.5 },
+              '& h3': { fontSize: '1.25rem', fontWeight: 600, mb: 1, mt: 2 },
+              '& p': { mb: 1.5, lineHeight: 1.6 },
+              '& ul, & ol': { mb: 1.5, pl: 3 },
+              '& li': { mb: 0.5 },
+              '& blockquote': { 
+                borderLeft: '4px solid',
+                borderColor: 'primary.main',
+                pl: 2,
+                py: 1,
+                bgcolor: 'grey.50',
+                fontStyle: 'italic'
+              },
+              '& code': { 
+                bgcolor: 'grey.100',
+                p: 0.5,
+                borderRadius: 0.5,
+                fontFamily: 'monospace',
+                fontSize: '0.875rem'
+              },
+              '& pre': { 
+                bgcolor: 'grey.900',
+                color: 'white',
+                p: 2,
+                borderRadius: 1,
+                overflow: 'auto',
+                mb: 2,
+                '& code': {
+                  bgcolor: 'transparent',
+                  p: 0,
+                  color: 'inherit'
+                }
+              },
+              '& a': {
+                color: 'primary.main',
+                textDecoration: 'none',
+                '&:hover': {
+                  textDecoration: 'underline'
+                }
+              },
+              '& hr': {
+                my: 2,
+                borderColor: 'divider'
+              }
             }}>
-              <Typography variant="body1" component="div">
-                {article.body ? (
-                  // Por enquanto, exibe o markdown como texto simples
-                  // No próximo tópico implementaremos o renderizador de markdown
-                  <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>
-                    {article.body}
-                  </pre>
-                ) : (
-                  <Typography color="text.secondary" fontStyle="italic">
-                    Conteúdo não disponível
-                  </Typography>
-                )}
-              </Typography>
+              {article.body ? (
+                <ReactMarkdown>
+                  {article.body}
+                </ReactMarkdown>
+              ) : (
+                <Typography color="text.secondary" fontStyle="italic">
+                  Conteúdo não disponível
+                </Typography>
+              )}
             </Box>
           </Box>
         )}
