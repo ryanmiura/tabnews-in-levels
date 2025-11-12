@@ -10,8 +10,7 @@ const connectDatabase = async () => {
 
     // Configurações de conexão
     const options = {
-      // useNewUrlParser e useUnifiedTopology são padrão no Mongoose 6+
-      // mas podemos adicionar outras configurações se necessário
+      // options futuramente
     };
 
     // Conectar ao MongoDB
