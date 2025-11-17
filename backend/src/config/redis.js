@@ -1,4 +1,4 @@
-import { createClient } from 'redis';
+const { createClient } = require('redis');
 
 // Cliente Redis global
 let redisClient = null;
@@ -86,7 +86,7 @@ const getRedisClient = async () => {
  * @param {number} ttl - Time to live em segundos (padrão: 300 = 5 minutos)
  * @returns {Promise<string>} Resultado da operação
  */
-export const setCache = async (key, value, ttl = 300) => {
+const setCache = async (key, value, ttl = 300) => {
   try {
     const client = await getRedisClient();
     const serializedValue = JSON.stringify(value);
@@ -107,7 +107,7 @@ export const setCache = async (key, value, ttl = 300) => {
  * @param {string} key - Chave do cache
  * @returns {Promise<any|null>} Valor deserializado ou null se não existir
  */
-export const getCache = async (key) => {
+const getCache = async (key) => {
   try {
     const client = await getRedisClient();
     const value = await client.get(key);
@@ -128,7 +128,7 @@ export const getCache = async (key) => {
  * @param {string} key - Chave do cache
  * @returns {Promise<number>} Número de chaves removidas
  */
-export const deleteCache = async (key) => {
+const deleteCache = async (key) => {
   try {
     const client = await getRedisClient();
     return await client.del(key);
@@ -143,7 +143,7 @@ export const deleteCache = async (key) => {
  * @param {string} pattern - Pattern para buscar chaves (ex: "contents:*")
  * @returns {Promise<number>} Número de chaves removidas
  */
-export const deleteCachePattern = async (pattern) => {
+const deleteCachePattern = async (pattern) => {
   try {
     const client = await getRedisClient();
     const keys = await client.keys(pattern);
@@ -164,7 +164,7 @@ export const deleteCachePattern = async (pattern) => {
  * @param {string} key - Chave do cache
  * @returns {Promise<boolean>} True se existe, false caso contrário
  */
-export const existsCache = async (key) => {
+const existsCache = async (key) => {
   try {
     const client = await getRedisClient();
     const exists = await client.exists(key);
@@ -181,7 +181,7 @@ export const existsCache = async (key) => {
  * @param {number} ttl - Time to live em segundos
  * @returns {Promise<boolean>} True se TTL foi definido com sucesso
  */
-export const setTTL = async (key, ttl) => {
+const setTTL = async (key, ttl) => {
   try {
     const client = await getRedisClient();
     const result = await client.expire(key, ttl);
@@ -198,7 +198,7 @@ export const setTTL = async (key, ttl) => {
  * @param {number} ttl - Tempo até expiração do token em segundos
  * @returns {Promise<string>} Resultado da operação
  */
-export const blacklistToken = async (token, ttl) => {
+const blacklistToken = async (token, ttl) => {
   try {
     const key = `blacklist:${token}`;
     return await setCache(key, { blacklisted: true }, ttl);
@@ -213,7 +213,7 @@ export const blacklistToken = async (token, ttl) => {
  * @param {string} token - Token JWT a verificar
  * @returns {Promise<boolean>} True se está na blacklist
  */
-export const isTokenBlacklisted = async (token) => {
+const isTokenBlacklisted = async (token) => {
   try {
     const key = `blacklist:${token}`;
     return await existsCache(key);
@@ -226,7 +226,7 @@ export const isTokenBlacklisted = async (token) => {
 /**
  * Desconecta do Redis (útil para graceful shutdown)
  */
-export const disconnectRedis = async () => {
+const disconnectRedis = async () => {
   try {
     if (redisClient && redisClient.isOpen) {
       await redisClient.quit();
@@ -237,5 +237,17 @@ export const disconnectRedis = async () => {
   }
 };
 
-// Exporta a função de conexão
-export default connectRedis;
+// Exporta as funções
+module.exports = {
+  connectRedis,
+  getRedisClient,
+  setCache,
+  getCache,
+  deleteCache,
+  deleteCachePattern,
+  existsCache,
+  setTTL,
+  blacklistToken,
+  isTokenBlacklisted,
+  disconnectRedis
+};

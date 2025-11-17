@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const contentSchema = new mongoose.Schema(
   {
@@ -266,4 +266,4 @@ contentSchema.set('toObject', { virtuals: true });
 
 const Content = mongoose.model('Content', contentSchema);
 
-export default Content;
+module.exports = Content;

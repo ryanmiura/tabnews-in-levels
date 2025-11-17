@@ -1,13 +1,13 @@
-import helmet from 'helmet';
-import cors from 'cors';
-import compression from 'compression';
-import rateLimit from 'express-rate-limit';
+const helmet = require('helmet');
+const cors = require('cors');
+const compression = require('compression');
+const rateLimit = require('express-rate-limit');
 
 /**
  * Configuração do Helmet para headers de segurança
  * Protege contra várias vulnerabilidades web comuns
  */
-export const helmetConfig = helmet({
+const helmetConfig = helmet({
   // Content Security Policy
   contentSecurityPolicy: {
     directives: {
@@ -37,7 +37,7 @@ export const helmetConfig = helmet({
  * Configuração do CORS
  * Permite requisições do frontend
  */
-export const corsConfig = cors({
+const corsConfig = cors({
   origin: (origin, callback) => {
     // Lista de origens permitidas
     const allowedOrigins = [
@@ -68,7 +68,7 @@ export const corsConfig = cors({
  * Configuração de compressão gzip/brotli
  * Otimiza o tamanho das respostas HTTP
  */
-export const compressionConfig = compression({
+const compressionConfig = compression({
   // Comprime apenas respostas maiores que 1KB
   threshold: 1024,
   // Nível de compressão (0-9, padrão: 6)
@@ -88,7 +88,7 @@ export const compressionConfig = compression({
  * Rate Limiter para rotas de autenticação
  * Previne ataques de força bruta
  */
-export const authRateLimiter = rateLimit({
+const authRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
   max: 5, // Máximo 5 tentativas
   message: {
@@ -117,7 +117,7 @@ export const authRateLimiter = rateLimit({
  * Rate Limiter geral para API
  * Previne abuso e sobrecarga do servidor
  */
-export const generalRateLimiter = rateLimit({
+const generalRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
   max: 100, // Máximo 100 requisições por janela
   message: {
@@ -142,7 +142,7 @@ export const generalRateLimiter = rateLimit({
  * Middleware para sanitizar inputs
  * Remove caracteres potencialmente perigosos
  */
-export const sanitizeInput = (req, res, next) => {
+const sanitizeInput = (req, res, next) => {
   // Função auxiliar para sanitizar strings
   const sanitize = (obj) => {
     if (typeof obj === 'string') {
@@ -182,7 +182,7 @@ export const sanitizeInput = (req, res, next) => {
  * Middleware de log de requisições
  * Registra informações básicas de cada requisição
  */
-export const requestLogger = (req, res, next) => {
+const requestLogger = (req, res, next) => {
   const start = Date.now();
 
   // Captura o fim da resposta
@@ -214,7 +214,7 @@ export const requestLogger = (req, res, next) => {
  * Exporta configuração completa de segurança
  * Para aplicar no app.js em ordem
  */
-export const securityMiddlewares = [
+const securityMiddlewares = [
   helmetConfig,
   corsConfig,
   compressionConfig,
@@ -222,10 +222,10 @@ export const securityMiddlewares = [
   requestLogger,
 ];
 
-export default {
-  helmet: helmetConfig,
-  cors: corsConfig,
-  compression: compressionConfig,
+module.exports = {
+  helmetConfig,
+  corsConfig,
+  compressionConfig,
   authRateLimiter,
   generalRateLimiter,
   sanitizeInput,
