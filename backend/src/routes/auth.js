@@ -155,7 +155,7 @@ router.post(
       const { username, password } = req.body;
 
       // Busca usuário por username ou email
-      const user = await User.findByIdentifier(username).select('+password');
+      const user = await User.findByIdentifier(username);
       if (!user) {
         return res.status(401).json({
           error: 'Credenciais inválidas'

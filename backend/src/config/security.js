@@ -105,7 +105,7 @@ const authRateLimiter = rateLimit({
     console.warn(`Rate limit excedido para IP: ${req.ip}`);
     res.status(429).json({
       error: 'Muitas tentativas. Tente novamente mais tarde.',
-      retryAfter: Math.ceil(req.rateLimit.resetTime / 1000),
+      retryAfter: Math.ceil(req.rateLimit.resetTime / 100),
     });
   },
   // Pula rate limit em caso de sucesso (opcional)

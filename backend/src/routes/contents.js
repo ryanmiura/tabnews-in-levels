@@ -65,16 +65,8 @@ router.get(
       const contents = await Content.findWithFilters(options);
       const total = await Content.countWithFilters({ status: 'published' });
 
-      const response = {
-        data: contents,
-        pagination: {
-          page,
-          per_page,
-          total,
-          total_pages: Math.ceil(total / per_page),
-          strategy
-        }
-      };
+      // Retorna array direto, igual ao TabNews
+      const response = contents;
 
       // Salva no cache
       await setCache(cacheKey, response, CACHE_TTL);
