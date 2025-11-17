@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 /**
  * Conecta ao MongoDB com configurações otimizadas de pool
@@ -75,7 +75,7 @@ const connectDatabase = async () => {
  * Obtém estatísticas de conexão do pool
  * @returns {Object} Estatísticas do pool
  */
-export const getConnectionStats = () => {
+const getConnectionStats = () => {
   const state = mongoose.connection.readyState;
   const stateMap = {
     0: 'disconnected',
@@ -96,7 +96,7 @@ export const getConnectionStats = () => {
  * Verifica se o banco está conectado
  * @returns {boolean}
  */
-export const isConnected = () => {
+const isConnected = () => {
   return mongoose.connection.readyState === 1;
 };
 
@@ -104,7 +104,7 @@ export const isConnected = () => {
  * Fecha a conexão com o banco de dados
  * @returns {Promise<void>}
  */
-export const disconnectDatabase = async () => {
+const disconnectDatabase = async () => {
   try {
     await mongoose.connection.close();
     console.log('MongoDB: Desconectado manualmente');
@@ -114,4 +114,7 @@ export const disconnectDatabase = async () => {
   }
 };
 
-export default connectDatabase;
+module.exports = connectDatabase;
+module.exports.getConnectionStats = getConnectionStats;
+module.exports.isConnected = isConnected;
+module.exports.disconnectDatabase = disconnectDatabase;
