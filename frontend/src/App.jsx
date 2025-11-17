@@ -5,6 +5,7 @@ import Home from './components/pages/Home.jsx'
 import Article from './components/pages/Article.jsx'
 import Login from './components/pages/Login.jsx'
 import Register from './components/pages/Register.jsx'
+import CreateContent from './components/pages/CreateContent.jsx'
 import { NewsProvider } from './contexts/NewsContext.jsx'
 import { MockProvider } from './contexts/MockContext.jsx'
 import { AuthProvider } from './contexts/AuthContext.jsx'
@@ -22,6 +23,7 @@ function App() {
                 <Route path="/contents/:user/:slug" element={<Article />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/create" element={<CreateContent />} />
               </Routes>
             </Box>
           </Box>
