@@ -15,7 +15,6 @@ const contentSchema = new mongoose.Schema(
     },
     slug: {
       type: String,
-      required: [true, 'Slug é obrigatório'],
       unique: true,
       trim: true,
       lowercase: true,
