@@ -17,7 +17,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 function CreateContent() {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   
   const [formData, setFormData] = useState({
     title: '',
@@ -28,12 +28,6 @@ function CreateContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-
-  // Redireciona se não estiver autenticado
-  if (!isAuthenticated()) {
-    navigate('/login');
-    return null;
-  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;

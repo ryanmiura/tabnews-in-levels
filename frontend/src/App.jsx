@@ -6,6 +6,7 @@ import Article from './components/pages/Article.jsx'
 import Login from './components/pages/Login.jsx'
 import Register from './components/pages/Register.jsx'
 import CreateContent from './components/pages/CreateContent.jsx'
+import PrivateRoute from './components/routing/PrivateRoute.jsx'
 import { NewsProvider } from './contexts/NewsContext.jsx'
 import { MockProvider } from './contexts/MockContext.jsx'
 import { AuthProvider } from './contexts/AuthContext.jsx'
@@ -23,7 +24,14 @@ function App() {
                 <Route path="/contents/:user/:slug" element={<Article />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/create" element={<CreateContent />} />
+                <Route 
+                  path="/create" 
+                  element={
+                    <PrivateRoute>
+                      <CreateContent />
+                    </PrivateRoute>
+                  } 
+                />
               </Routes>
             </Box>
           </Box>
