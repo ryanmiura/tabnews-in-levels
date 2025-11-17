@@ -11,7 +11,8 @@ export const configureMocks = (useMocksFunction) => {
 };
 
 // Configuração base da API
-const BASE_URL = 'https://www.tabnews.com.br/api/v1';
+// Usa variável de ambiente ou fallback para localhost
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 // Instância do axios configurada
 const apiClient = axios.create({
@@ -21,6 +22,23 @@ const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Interceptor para adicionar token JWT nas requisições
+apiClient.interceptors.request.use(
+  (config) => {
+    // Pega o token do localStorage
+    const token = localStorage.getItem('token');
+    
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 // Interceptor para tratamento de erros
 apiClient.interceptors.response.use(
