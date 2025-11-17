@@ -196,10 +196,29 @@ contentSchema.statics.findWithFilters = async function (options = {}) {
     .sort(sort)
     .skip(skip)
     .limit(per_page)
-    .populate('owner_id', 'username email')
-    .lean();
+    .select('-__v') // Remove __v
+    .lean({ virtuals: true }); // Usa lean mas mantém virtuals
 
-  return contents;
+  // Transforma _id em id e ajusta owner_id para ser apenas string
+  return contents.map(content => ({
+    id: content._id.toString(),
+    owner_id: content.owner_id?._id?.toString() || content.owner_id,
+    parent_id: content.parent_id?.toString() || null,
+    slug: content.slug,
+    title: content.title,
+    status: content.status,
+    source_url: content.source_url,
+    created_at: content.created_at,
+    updated_at: content.updated_at,
+    published_at: content.published_at,
+    deleted_at: content.deleted_at,
+    tabcoins: content.tabcoins,
+    tabcoins_credit: content.tabcoins_credit,
+    tabcoins_debit: content.tabcoins_debit,
+    owner_username: content.owner_username,
+    children_deep_count: content.children_deep_count,
+    body: content.body,
+  }));
 };
 
 /**
